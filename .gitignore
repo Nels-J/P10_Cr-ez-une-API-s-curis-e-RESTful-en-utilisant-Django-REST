@@ -81,3 +81,6 @@ dmypy.json
 
 # Notes related to the project (Not documentation, but notes for development)
 notes/
+
+# JetBrains HTTP Client secrets
+**/http-client.private.env.json
