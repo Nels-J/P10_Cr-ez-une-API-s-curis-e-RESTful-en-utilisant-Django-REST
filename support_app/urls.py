@@ -19,7 +19,7 @@ Including another URLconf
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from support_app.views import test_view
+from support_app.views import test_view, HelloView
 
 urlpatterns = [
         # Test view TO DELETE WHEN TEST OK
@@ -28,6 +28,8 @@ urlpatterns = [
         # Auth JWT
         path("support_app/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
         path("support_app/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+
+        path("support_app/hello/", HelloView.as_view()),  # Protected view for testing simplejwt token
 
         # API endpoints
         # todo :

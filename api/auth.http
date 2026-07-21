@@ -1,0 +1,49 @@
+// https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html
+// Variables en provenance soit de http-client.env.json, soit de http-client.private.env
+
+### Login
+POST {{host}}/support_app/token/
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+> {%
+client.test("Login OK", function() {
+
+    // Assert
+    client.assert(response.status === 200, "Le login devrait retourner un code 200 ce n'est pas le cas ici."); // (Si VRAI => Test OK (vert), Si FAUX => 'message d'erreur')
+    client.assert(response.body.access, "Le token access devrait être présent dans la réponse, ce n'est pas le cas ici.");
+    client.assert(response.body.refresh, "Le token refresh devrait être présent dans la réponse, ce n'est pas le cas ici.");
+});
+
+// Stockage des tokens dans les variables globales pour les utiliser dans les requêtes suivantes
+client.global.set("access_token", response.body.access);
+client.global.set("refresh_token", response.body.refresh);
+
+// Log un message visible dans l'onglet "Response Handler" du tool PyCharm service  HTTP Client (ou dans la console si vous utilisez un autre outil)
+client.log("Les Tokens sont mis à jour.");
+%}
+
+### Endpoint protégé
+GET {{host}}/support_app/hello/
+Authorization: Bearer {{access_token}}
+
+
+### Rafraîchir le token
+POST {{host}}/support_app/token/refresh/
+Content-Type: application/json
+
+{
+  "refresh": "{{refresh_token}}"
+}
+
+> {%
+client.global.set("access_token", response.body.access);
+client.log("Le Token d'accès est mis à jour.");  // visible dans l'onglet "Response Handler" du tool PyCharm service  HTTP Client
+%}
+
+### Endpoint public
+GET {{host}}/test/

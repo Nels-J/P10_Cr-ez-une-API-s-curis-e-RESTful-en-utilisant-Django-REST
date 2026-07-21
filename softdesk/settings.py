@@ -107,7 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "fr-fr"
 
 TIME_ZONE = "UTC"
 
@@ -134,8 +134,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-        'ACCESS_TOKEN_LIFETIME'   : timedelta(minutes=5),  # Durée de vie courte
+        'ACCESS_TOKEN_LIFETIME'   : timedelta(minutes=1),  # Durée de vie courte
         'REFRESH_TOKEN_LIFETIME'  : timedelta(days=1),  # Durée de vie longue
-        'ROTATE_REFRESH_TOKENS'   : True,  # Rotation des tokens
-        'BLACKLIST_AFTER_ROTATION': True,  # Blacklist les anciens
+        # 'ROTATE_REFRESH_TOKENS'   : True,  # Rotation des tokens
+        # 'BLACKLIST_AFTER_ROTATION': True,  # Blacklist les anciens
 }
