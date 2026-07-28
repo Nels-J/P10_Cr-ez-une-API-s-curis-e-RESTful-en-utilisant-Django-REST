@@ -1,19 +1,21 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
-
-
-# Create your models here.
+from django.utils.translation import gettext_lazy as _
 
 
 class User(AbstractUser):
-    birth_date = models.DateField(null=False, blank=False)
+    birth_date = models.DateField(verbose_name=_("Date de naissance"), null=False, blank=False)
 
-    can_be_contacted = models.BooleanField(default=False)
-    can_be_contacted_updated_at = models.DateTimeField(null=True, blank=True)
+    can_be_contacted = models.BooleanField(verbose_name=_("Peut être contacté"), default=False)
+    can_be_contacted_updated_at = models.DateTimeField(
+            verbose_name=_("Dernière màj. du consentement de contact"), null=True, blank=True,
+    )
 
-    can_data_be_shared = models.BooleanField(default=False)
-    can_data_be_shared_updated_at = models.DateTimeField(null=True, blank=True)
+    can_data_be_shared = models.BooleanField(verbose_name=_("Les données peuvent être partagées"), default=False)
+    can_data_be_shared_updated_at = models.DateTimeField(
+            verbose_name=_("Dernière màj. du consentement de partage des données"), null=True, blank=True,
+    )
 
     REQUIRED_FIELDS = ["birth_date"]
 
