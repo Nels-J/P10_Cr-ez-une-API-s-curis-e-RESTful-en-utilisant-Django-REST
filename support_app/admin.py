@@ -56,7 +56,9 @@ class CustomUserAdmin(UserAdmin):
     )
 
     readonly_fields = (
+            "can_be_contacted",
             "can_be_contacted_updated_at",
+            "can_data_be_shared",
             "can_data_be_shared_updated_at",
             "last_login",
             "date_joined",
@@ -66,7 +68,7 @@ class CustomUserAdmin(UserAdmin):
             (
                     None,
                     {
-                            "fields" : (
+                            "fields": (
                                     "username",
                                     "password1",
                                     "password2",
