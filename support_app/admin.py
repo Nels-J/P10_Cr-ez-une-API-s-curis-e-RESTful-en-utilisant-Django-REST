@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.utils.translation import gettext_lazy as _
 
 from support_app.models import Contributor, Project, User
 
@@ -13,7 +14,7 @@ class CustomUserAdmin(UserAdmin):
     fieldsets = (
             (None, {"fields": ("username", "password")}),
             (
-                    "Informations personnelles",
+                    _("Informations personnelles"),
                     {
                             "fields": (
                                     "birth_date",
@@ -21,7 +22,7 @@ class CustomUserAdmin(UserAdmin):
                     },
             ),
             (
-                    "Consentements",
+                    _("Consentements"),
                     {
                             "fields": (
                                     "can_be_contacted",
@@ -32,7 +33,7 @@ class CustomUserAdmin(UserAdmin):
                     },
             ),
             (
-                    "Permissions",
+                    _("Permissions"),
                     {
                             "fields": (
                                     "is_active",
@@ -44,7 +45,7 @@ class CustomUserAdmin(UserAdmin):
                     },
             ),
             (
-                    "Dates importantes",
+                    _("Dates importantes"),
                     {
                             "fields": (
                                     "last_login",
