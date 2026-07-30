@@ -10,9 +10,9 @@ from support_app.views import UserViewSet
 
 urlpatterns = [
     # Auth JWT
-    path("support_app/auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path(
-        "support_app/auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"
+        "auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"
     ),
     # API endpoints
     path(
