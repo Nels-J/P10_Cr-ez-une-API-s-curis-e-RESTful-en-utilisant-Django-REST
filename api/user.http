@@ -16,15 +16,21 @@ Content-Type: application/json
     client.global.set("refresh_token", response.body.refresh);
 %}
 
-### Refresh token
-POST {{host}}/support_app/auth/token/refresh/
+### User list reachable with authentication
+GET {{host}}/users/
+Authorization: Bearer {{access_token}}
+
+> {%
+    client.log("Accès à l'endpoint /users/ OK si le token fourni est valide.");
+    client.log("Liste des utilisateurs : " + JSON.stringify(response.body, null, 2));
+%}
+
+### Create a new user
+POST {{host}}/users/
 Content-Type: application/json
 
 {
-  "refresh": "{{refresh_token}}"
+  "username": "newuserAPI2",
+  "password": "secondapipassword",
+  "birth_date": "1977-01-01"
 }
-
-> {%
-    // Mise à jour du token d'accès dans les variables globales pour les utiliser dans les requêtes suivantes
-    client.global.set("access_token", response.body.access);
-%}

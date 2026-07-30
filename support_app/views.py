@@ -1,28 +1,22 @@
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
-from rest_framework.response import Response
-from rest_framework.views import APIView
+
+from .models import User
+from .serializers import UserSerializer, UserDetailSerializer
 
 
-# Create your views here.
-
-
-@api_view(["GET"])
-@permission_classes([AllowAny])
-def test_view(request: Request) -> Response:
-    """Test l'API avec un simple GET pour vérif."""
-    return Response(
-            {"message": "Hello DRF 👋"},
-    )
-
-
-class HelloView(APIView):
-    """Test simple d'une vue nécessitant d'être authentifié."""
+class UserViewSet(viewsets.ModelViewSet[User]):
     permission_classes = [IsAuthenticated]
+    queryset = User.objects.all()
 
-    def get(self, request):
-        return Response({
-            "message": "Bonjour, vous êtes authentifié avec un token !",
-            "user": request.user.username
-        })
+    def check_permissions(self, request: Request) -> None:
+        if request.method == "POST":
+            return
+        super().check_permissions(request)
+
+    def get_serializer_class(self) -> type[UserSerializer | UserDetailSerializer]:
+        if self.request.method in ["POST"]:
+            return UserSerializer
+        else:
+            return UserDetailSerializer
