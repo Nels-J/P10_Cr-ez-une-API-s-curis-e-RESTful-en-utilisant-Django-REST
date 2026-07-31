@@ -41,7 +41,7 @@ class UserSerializer(serializers.ModelSerializer[User]):
     def save(self, **kwargs: Any) -> User:
         user = User.objects.create_user(
             username=self.validated_data["username"],
-            password=self.validated_data["password"],
+            password=self.validated_data["password"],  # Use create_user to hash the password
             birth_date=self.validated_data["birth_date"],
             can_data_be_shared=self.validated_data.get("can_data_be_shared", False),
             can_be_contacted=self.validated_data.get("can_be_contacted", False),
