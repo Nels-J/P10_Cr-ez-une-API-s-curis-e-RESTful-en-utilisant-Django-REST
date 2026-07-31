@@ -84,3 +84,6 @@ notes/
 
 # JetBrains HTTP Client secrets
 **/http-client.private.env.json
+
+# Copilot settings
+AGENTS.md
