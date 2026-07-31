@@ -24,27 +24,17 @@ urlpatterns = [
         name="user-list",
     ),
 
-    # todo :
-    # path(
-    #     "users/<int:user_id>/",
-    #     UserViewSet.as_view({"get": "retrieve", "put": "update", "delete": "destroy"}),
-    #     name="user-detail",
-    # ),
-    # /projects/
-    # /projects/
-    # /projects/{project_id}
-    # /projects/{project_id}
-    # /projects/{project_id}
-    # /projects/{project_id}/issues/
-    # /projects/{project_id}/issues/
-    # /projects/{project_id}/issues/{issue_id}
-    # /projects/{project_id}/issues/{issue_id}
-    # /projects/{project_id}/issues/{issue_id}
-    # /projects/{project_id}/issues/{issue_id}/comments/
-    # /projects/{project_id}/issues/{issue_id}/comments/{comment_id}
-    # /projects/{project_id}/issues/{issue_id}/comments/
-    # /projects/{project_id}/issues/{issue_id}/comments/{comment_id}
-    # /projects/{project_id}/issues/{issue_id}/comments/{comment_id}
-    # /projects/{project_id}/join  # rejoindre un projet
-    # /projects/{project_id}/leave  # quitter un projet
-]
+# TODO's
+# PROJECTS :
+# /projects/
+# /projects/{project_id}
+# /projects/{project_id}/join  # rejoindre un projet
+# /projects/{project_id}/leave  # quitter un projet
+
+# ISSUES
+# /projects/{project_id}/issues/
+# /projects/{project_id}/issues/{issue_id}
+
+# COMMENTS
+# /projects/{project_id}/issues/{issue_id}/comments/
+# /projects/{project_id}/issues/{issue_id}/comments/{comment_id}
