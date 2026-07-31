@@ -4,7 +4,7 @@ URL configuration for softdesk project.
 """
 
 from django.urls import path
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 from support_app.views import UserViewSet
 
@@ -14,7 +14,10 @@ urlpatterns = [
     path(
         "auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"
     ),
-    # API endpoints
+    path("auth/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
+
+
+    # Users
     path(
         "users/",
         UserViewSet.as_view({"get": "list", "post": "create"}),
