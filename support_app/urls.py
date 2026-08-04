@@ -10,7 +10,7 @@ from support_app.views import UserViewSet
 
 urlpatterns = [
     # Auth JWT
-    path("auth/jwt/create", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("auth/jwt/create/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path(
         "auth/jwt/refresh/", TokenRefreshView.as_view(), name="token_refresh"
     ),
@@ -23,6 +23,13 @@ urlpatterns = [
         UserViewSet.as_view({"get": "list", "post": "create"}),
         name="user-list",
     ),
+    path("users/me/", UserViewSet.as_view({"get": "retrieve"}), name="user-me"),
+    path(
+        "users/<int:user_id>/",
+        UserViewSet.as_view({"get": "retrieve", "put": "update", "delete": "destroy"}),
+        name="user-detail",
+    ),
+]
 
 # TODO's
 # PROJECTS :
