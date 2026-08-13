@@ -20,3 +20,9 @@ class UserViewSet(viewsets.ModelViewSet[User]):
             return UserSerializer
         else:
             return UserDetailSerializer
+
+    def get_object(self):
+        if self.kwargs.get(self.lookup_url_kwarg) is None:
+            return self.request.user
+        return super().get_object()
+
