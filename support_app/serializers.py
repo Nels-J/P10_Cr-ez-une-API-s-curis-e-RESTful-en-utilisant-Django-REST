@@ -4,7 +4,7 @@ from typing import Any
 from django.utils import timezone
 from rest_framework import serializers
 
-from .models import User
+from .models import User, Project
 
 
 class UserUpdateSerializer(serializers.ModelSerializer[User]):
@@ -56,3 +56,32 @@ class UserSerializer(serializers.ModelSerializer[User]):
             can_be_contacted=validated_data.get("can_be_contacted", False),
         )
         return user
+
+
+class ProjectUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ["name", "description", "category"]
+
+
+class ProjectDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ["id", "name", "description", "category"]
+        read_only_fields = ["id", "author"]
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ["id", "name", "description", "category"]
+        read_only_fields = ["id", "author"]
+
+    def create(self, validated_data: dict[str, Any]) -> Project:
+        project = Project.objects.create(
+            name=validated_data["name"],
+            description=validated_data.get("description", ""),
+            category=validated_data["category"],
+            author=self.context["request"].user  # Set the author to the currently authenticated user
+        )
+        return project

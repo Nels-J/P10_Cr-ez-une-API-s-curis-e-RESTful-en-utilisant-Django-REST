@@ -2,11 +2,15 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 
-from .models import User
 from .serializers import (
+    UserUpdateSerializer,
     UserDetailSerializer,
-    UserUpdateSerializer, UserSerializer,
+    UserSerializer,
+    ProjectSerializer,
+    ProjectDetailSerializer,
+    ProjectUpdateSerializer,
 )
+from .models import User, Project
 
 
 class UserViewSet(viewsets.ModelViewSet[User]):
@@ -34,5 +38,19 @@ class UserViewSet(viewsets.ModelViewSet[User]):
         return super().get_object()  # If a user_id is provided in the URL, return that user object.
 
 
-# class ProjectViewSet:
-#     pass
+class ProjectViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = Project.objects.all()
+    lookup_url_kwarg = "project_id"
+
+    def check_permissions(self, request: Request) -> None:
+        if request.method == "POST":
+            return
+        super().check_permissions(request)
+
+    def get_serializer_class(self) -> type[ProjectSerializer, ProjectDetailSerializer | ProjectUpdateSerializer]:
+        if self.action == "create":
+            return ProjectSerializer
+        if self.action in {"update", "partial_update"}:
+            return ProjectUpdateSerializer
+        return ProjectDetailSerializer
