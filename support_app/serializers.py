@@ -7,6 +7,12 @@ from rest_framework import serializers
 from .models import User
 
 
+class UserUpdateSerializer(serializers.ModelSerializer[User]):
+    class Meta:
+        model = User
+        fields = ["can_data_be_shared", "can_be_contacted"]
+
+
 class UserDetailSerializer(serializers.ModelSerializer[User]):
     class Meta:
         model = User
@@ -18,12 +24,15 @@ class UserSerializer(serializers.ModelSerializer[User]):
     class Meta:
         model = User
         fields = [
+            "id",
             "username",
             "password",
             "birth_date",
             "can_data_be_shared",
             "can_be_contacted",
         ]
+        read_only_fields = ["id"]
+        extra_kwargs = {"password": {"write_only": True}}  # Ensure password is write-only
 
     def validate_birth_date(self, value: date) -> date:
         today = timezone.localdate()
@@ -38,12 +47,12 @@ class UserSerializer(serializers.ModelSerializer[User]):
             )
         return value
 
-    def save(self, **kwargs: Any) -> User:
+    def create(self, validated_data: dict[str, Any]) -> User:
         user = User.objects.create_user(
-            username=self.validated_data["username"],
-            password=self.validated_data["password"],  # Use create_user to hash the password
-            birth_date=self.validated_data["birth_date"],
-            can_data_be_shared=self.validated_data.get("can_data_be_shared", False),
-            can_be_contacted=self.validated_data.get("can_be_contacted", False),
+            username=validated_data["username"],
+            password=validated_data["password"],  # Use create_user to hash the password
+            birth_date=validated_data["birth_date"],
+            can_data_be_shared=validated_data.get("can_data_be_shared", False),
+            can_be_contacted=validated_data.get("can_be_contacted", False),
         )
         return user
