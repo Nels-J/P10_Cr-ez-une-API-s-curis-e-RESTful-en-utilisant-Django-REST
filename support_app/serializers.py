@@ -16,8 +16,8 @@ class UserUpdateSerializer(serializers.ModelSerializer[User]):
 class UserDetailSerializer(serializers.ModelSerializer[User]):
     class Meta:
         model = User
-        fields = ["id", "username"]
-        read_only_fields = ["id", "username"]
+        fields = ["id", "username", "birth_date", "can_data_be_shared", "can_be_contacted", "date_joined"]
+        read_only_fields = ["id", "username", "date_joined"]
 
 
 class UserSerializer(serializers.ModelSerializer[User]):
@@ -30,8 +30,9 @@ class UserSerializer(serializers.ModelSerializer[User]):
             "birth_date",
             "can_data_be_shared",
             "can_be_contacted",
+            "date_joined"
         ]
-        read_only_fields = ["id"]
+        read_only_fields = ["id", "date_joined"]
         extra_kwargs = {"password": {"write_only": True}}  # Ensure password is write-only
 
     def validate_birth_date(self, value: date) -> date:
@@ -67,15 +68,15 @@ class ProjectUpdateSerializer(serializers.ModelSerializer):
 class ProjectDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ["id", "name", "description", "category"]
-        read_only_fields = ["id", "author"]
+        fields = ["id", "name", "description", "category", "author", "created_time"]
+        read_only_fields = ["id", "author", "created_time"]
 
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ["id", "name", "description", "category"]
-        read_only_fields = ["id", "author"]
+        fields = ["id", "name", "description", "category", "author", "created_time"]
+        read_only_fields = ["id", "author", "created_time"]
 
     def create(self, validated_data: dict[str, Any]) -> Project:
         project = Project.objects.create(
