@@ -38,7 +38,6 @@ class Project(models.Model):
     category = models.CharField(
         max_length=20, choices=Category.choices, null=False, blank=False
     )
-    is_archived = models.BooleanField(default=False)
 
 
 class Contributor(models.Model):
