@@ -30,13 +30,12 @@ class CustomUserAdmin(UserAdmin):
             {
                 "fields": (
                     "can_be_contacted",
-                    "can_be_contacted_updated_at",
                     "can_data_be_shared",
-                    "can_data_be_shared_updated_at",
                 ),
             },
         )
     )
+
     fieldsets = tuple(fieldsets)
 
     readonly_fields = ("last_login", "date_joined")
@@ -70,9 +69,7 @@ class CustomUserAdmin(UserAdmin):
             readonly_fields.extend(
                 (
                     "can_be_contacted",
-                    "can_be_contacted_updated_at",
                     "can_data_be_shared",
-                    "can_data_be_shared_updated_at",
                 )
             )
         return readonly_fields
