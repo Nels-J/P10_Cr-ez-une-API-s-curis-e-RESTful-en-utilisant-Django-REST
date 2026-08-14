@@ -39,6 +39,9 @@ class Project(models.Model):
         max_length=20, choices=Category.choices, null=False, blank=False
     )
 
+    def __str__(self) -> str:
+        return self.name
+
 
 class Contributor(models.Model):
     contributor = models.ForeignKey(
