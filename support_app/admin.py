@@ -9,14 +9,14 @@ from support_app.models import Contributor, Project, User
 class ContributorAdmin(admin.ModelAdmin):
     list_display = ("project", "contributor", "created_time")
     search_fields = ("project__name", "contributor__username")
-    list_filter = ("project", "contributor")
+    list_filter = ("contributor",)
 
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ("name", "description", "category", "author")
     search_fields = ("name", "description", "category", "author__username")
-    list_filter = ("category", "author")
+    list_filter = ("category",)
 
 
 @admin.register(User)
