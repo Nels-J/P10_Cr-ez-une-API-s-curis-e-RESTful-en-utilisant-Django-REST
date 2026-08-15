@@ -10,7 +10,7 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 
-from support_app.views import UserViewSet, ProjectViewSet
+from support_app.views import UserViewSet, ProjectViewSet, ContributorViewSet
 
 urlpatterns = [
     # Auth JWT
@@ -40,5 +40,13 @@ urlpatterns = [
         "projects/<int:project_id>/",
         ProjectViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"}),
         name="project-detail",
+    ),
+
+    # Contributors
+    path(
+        "projects/<int:project_id>/contributors/",
+        ContributorViewSet.as_view({"get": "list", "post": "create"}),
+        name="contributor-list",
     )
+
 ]

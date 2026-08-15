@@ -4,7 +4,7 @@ from typing import Any
 from django.utils import timezone
 from rest_framework import serializers
 
-from .models import User, Project
+from .models import User, Project, Contributor
 
 
 class UserUpdateSerializer(serializers.ModelSerializer[User]):
@@ -86,3 +86,11 @@ class ProjectSerializer(serializers.ModelSerializer):
             author=self.context["request"].user  # Set the author to the currently authenticated user
         )
         return project
+
+
+class ContributorSerializer(serializers.ModelSerializer[Contributor]):
+    class Meta:
+        model = Contributor
+        fields = ["id", "contributor", "project", "created_time"]
+        read_only_fields = ["id", "project", "contributor","created_time"]
+

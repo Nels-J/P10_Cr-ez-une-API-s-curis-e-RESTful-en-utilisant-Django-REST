@@ -9,8 +9,9 @@ from .serializers import (
     ProjectSerializer,
     ProjectDetailSerializer,
     ProjectUpdateSerializer,
+    ContributorSerializer,
 )
-from .models import User, Project
+from .models import User, Project, Contributor
 
 
 class UserViewSet(viewsets.ModelViewSet[User]):
@@ -43,14 +44,24 @@ class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     lookup_url_kwarg = "project_id"
 
-    def check_permissions(self, request: Request) -> None:
-        if request.method == "POST":
-            return
-        super().check_permissions(request)
-
     def get_serializer_class(self) -> type[ProjectSerializer, ProjectDetailSerializer | ProjectUpdateSerializer]:
         if self.action == "create":
             return ProjectSerializer
         if self.action in {"update", "partial_update"}:
             return ProjectUpdateSerializer
         return ProjectDetailSerializer
+
+
+class ContributorViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = Contributor.objects.all()
+    serializer_class = ContributorSerializer
+
+    def get_queryset(self):
+        return self.queryset.filter(project_id=self.kwargs["project_id"])
+
+    def perform_create(self, serializer) -> None:
+        serializer.save(
+                project_id=self.kwargs["project_id"],
+                contributor=self.request.user,
+        )
