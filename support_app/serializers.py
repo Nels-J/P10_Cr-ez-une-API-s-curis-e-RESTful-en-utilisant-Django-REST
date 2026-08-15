@@ -1,6 +1,7 @@
 from datetime import date
 from typing import Any
 
+from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers
 
@@ -72,7 +73,9 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "author", "created_time"]
 
 
+@transaction.atomic  # Ensure that the creation of a project and its initial contributor is atomic
 class ProjectSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Project
         fields = ["id", "name", "description", "category", "author", "created_time"]
@@ -85,6 +88,12 @@ class ProjectSerializer(serializers.ModelSerializer):
             category=validated_data["category"],
             author=self.context["request"].user  # Set the author to the currently authenticated user
         )
+
+        Contributor.objects.create(
+            contributor=self.context["request"].user,
+            project=project,
+        )
+
         return project
 
 
