@@ -94,3 +94,18 @@ class ContributorSerializer(serializers.ModelSerializer[Contributor]):
         fields = ["id", "contributor", "project", "created_time"]
         read_only_fields = ["id", "project", "contributor","created_time"]
 
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        request = self.context.get("request")  # Get the request object from the serializer context
+        project_id = self.context["view"].kwargs["project_id"]  # Get the project_id from the view's URL kwargs
+
+        if Contributor.objects.filter(
+                contributor=request.user,
+                project_id=project_id,
+        ).exists():  # Check if the user is already a contributor to the project.
+            # If the user is already a contributor, raise a validation error.
+            raise serializers.ValidationError(
+                "Cet utilisateur est déjà un contributeur de ce projet."
+            )
+
+        return attrs  # Return the modified attrs dictionary, which will be used to create the Contributor instance.
+
