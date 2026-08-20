@@ -9,9 +9,9 @@ from .serializers import (
     ProjectSerializer,
     ProjectDetailSerializer,
     ProjectUpdateSerializer,
-    ContributorSerializer,
+    ContributorSerializer, IssueSerializer,
 )
-from .models import User, Project, Contributor
+from .models import User, Project, Contributor, Issue
 
 
 class UserViewSet(viewsets.ModelViewSet[User]):
@@ -53,6 +53,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
 
 class ContributorViewSet(viewsets.ModelViewSet):
+    # todo: pourrait être juste un CreateAPIView, mais on garde le ModelViewSet pour la liste des contributeurs
     permission_classes = [IsAuthenticated]
     queryset = Contributor.objects.all()
     serializer_class = ContributorSerializer
@@ -64,4 +65,19 @@ class ContributorViewSet(viewsets.ModelViewSet):
         serializer.save(
                 project_id=self.kwargs["project_id"],
                 contributor=self.request.user,
+        )
+
+
+class IssueViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = Issue.objects.all()
+    serializer_class = IssueSerializer
+
+    def get_queryset(self):
+        return self.queryset.filter(project_id=self.kwargs["project_id"])  # Filter issues based on the project_id from the URL.
+
+    def perform_create(self, serializer) -> None:
+        serializer.save(
+            project_id=self.kwargs["project_id"],
+            author=self.request.user,
         )
