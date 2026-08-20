@@ -1,0 +1,96 @@
+// https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html
+// Variables en provenance soit de http-client.env.json, soit de http-client.private.env
+
+### Login
+POST {{host}}/auth/jwt/create/
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+> {%
+    // Stockage des tokens dans les variables globales pour les utiliser dans les requêtes suivantes
+    client.global.set("access_token", response.body.access);
+    client.global.set("refresh_token", response.body.refresh);
+%}
+
+
+### Create Project
+POST {{host}}/projects/
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "name": "My New Project",
+  "description": "This is a description of my new project.",
+  "category": "Front-End"
+}
+
+
+### Get All Projects with token
+GET {{host}}/projects/
+Authorization: Bearer {{access_token}}
+
+
+### Cant Get All Projects without token
+GET {{host}}/projects/
+
+
+### Get Project by ID
+GET {{host}}/projects/8/
+Authorization: Bearer {{access_token}}
+
+
+### Partial Update Project by ID
+PATCH {{host}}/projects/3/
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "category": "iOS"
+}
+
+
+### Full Update Project by ID
+PUT {{host}}/projects/3/
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "name": "Updated Project Name",
+  "description": "Updated description of the project.",
+  "category": "iOS"
+}
+
+
+### Delete Project by ID
+DELETE {{host}}/projects/3/
+Authorization: Bearer {{access_token}}
+
+
+### Get all contributors to a dedicated project
+GET {{host}}/projects/11/contributors/
+Authorization: Bearer {{access_token}}
+
+
+### Add a contributor to a dedicated project
+POST {{host}}/projects/8/contributors/
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+### Add an issue to a dedicated project
+POST {{host}}/projects/11/issues/
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "title": "New Issue",
+  "description": "Description of the new issue.",
+  "tags": "Bug",
+  "priority": "High",
+  "assignee": 12,
+  "status": "To Do"
+}
+

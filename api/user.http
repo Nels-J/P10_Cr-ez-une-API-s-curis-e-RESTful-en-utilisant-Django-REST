@@ -2,7 +2,7 @@
 // Variables en provenance soit de http-client.env.json, soit de http-client.private.env
 
 ### Login
-POST {{host}}/support_app/auth/token/
+POST {{host}}/auth/jwt/create/
 Content-Type: application/json
 
 {
@@ -30,7 +30,23 @@ POST {{host}}/users/
 Content-Type: application/json
 
 {
-  "username": "newuserAPI2",
-  "password": "secondapipassword",
-  "birth_date": "1977-01-01"
+  "username": "jeuditreizeaout_1",
+  "password": "ApiPa55word",
+  "birth_date": "1977-01-01",
+  "can_be_contacted": true
+}
+
+### retrieve me
+GET {{host}}/users/me/
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+### Update me
+PATCH {{host}}/users/12/
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "can_be_contacted": true,
+  "can_data_be_shared": false
 }

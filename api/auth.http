@@ -2,7 +2,7 @@
 // Variables en provenance soit de http-client.env.json, soit de http-client.private.env
 
 ### Login
-POST {{host}}/support_app/auth/token/
+POST {{host}}/auth/jwt/create/
 Content-Type: application/json
 
 {
@@ -17,7 +17,7 @@ Content-Type: application/json
 %}
 
 ### Refresh token
-POST {{host}}/support_app/auth/token/refresh/
+POST {{host}}/auth/jwt/refresh/
 Content-Type: application/json
 
 {
