@@ -39,6 +39,16 @@ class Project(models.Model):
         max_length=20, choices=Category.choices, null=False, blank=False
     )
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if not Contributor.objects.filter(contributor=self.author, project=self).exists():
+            Contributor.objects.create(
+                contributor=self.author,
+                project=self
+            )
+
+
     def __str__(self) -> str:
         return self.name
 
