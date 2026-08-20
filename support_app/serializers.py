@@ -5,7 +5,7 @@ from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers
 
-from .models import User, Project, Contributor
+from .models import User, Project, Contributor, Issue
 
 
 class UserUpdateSerializer(serializers.ModelSerializer[User]):
@@ -75,26 +75,12 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
 
 @transaction.atomic  # Ensure that the creation of a project and its initial contributor is atomic
 class ProjectSerializer(serializers.ModelSerializer):
+    author = serializers.HiddenField(default=serializers.CurrentUserDefault())  # Automatically set the author to the currently authenticated user
 
     class Meta:
         model = Project
         fields = ["id", "name", "description", "category", "author", "created_time"]
-        read_only_fields = ["id", "author", "created_time"]
-
-    def create(self, validated_data: dict[str, Any]) -> Project:
-        project = Project.objects.create(
-            name=validated_data["name"],
-            description=validated_data.get("description", ""),
-            category=validated_data["category"],
-            author=self.context["request"].user  # Set the author to the currently authenticated user
-        )
-
-        Contributor.objects.create(
-            contributor=self.context["request"].user,
-            project=project,
-        )
-
-        return project
+        read_only_fields = ["id", "created_time"]
 
 
 class ContributorSerializer(serializers.ModelSerializer[Contributor]):
@@ -118,3 +104,15 @@ class ContributorSerializer(serializers.ModelSerializer[Contributor]):
 
         return attrs  # Return the modified attrs dictionary, which will be used to create the Contributor instance.
 
+
+class IssueSerializer(serializers.ModelSerializer):
+    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    class Meta:
+        model = Issue
+        fields = ['id', 'title', 'description', 'tags', 'priority','assignee', 'status','project', 'author', 'created_time']
+        read_only_fields = ['created_time', 'id', 'project']
+
+    def create(self, validated_data):
+        validated_data['project_id'] = self.context['view'].kwargs['project_id']
+        return super().create(validated_data)
