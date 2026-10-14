@@ -30,8 +30,8 @@ POST {{host}}/users/
 Content-Type: application/json
 
 {
-  "username": "jeuditreizeaout_1",
-  "password": "ApiPa55word",
+  "username": "testuser",
+  "password": "MotDePasseTest123!",
   "birth_date": "1977-01-01",
   "can_be_contacted": true
 }

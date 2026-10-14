@@ -23,7 +23,7 @@ Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
-  "name": "My New Project",
+  "name": "My New Project with new contributor",
   "description": "This is a description of my new project.",
   "category": "Front-End"
 }
