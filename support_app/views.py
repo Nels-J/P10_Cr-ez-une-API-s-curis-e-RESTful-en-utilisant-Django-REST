@@ -51,12 +51,18 @@ class UserViewSet(viewsets.ModelViewSet[User]):
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
-    permission_classes = [
-        IsAuthenticated,
-        IsContributor,
-    ]  # Only authenticated users who are contributors can access this viewset.
     queryset = Project.objects.all()
     lookup_url_kwarg = "project_id"
+
+    # Custom permission handling based on the action being performed.
+    def get_permissions(self):
+        if self.action in {"list", "create"}:
+            return [IsAuthenticated()]
+        if self.action == "retrieve":
+            return [IsAuthenticated(), IsContributor()]
+        if self.action in {"update", "partial_update", "destroy"}:
+            return [IsAuthenticated(), IsContributor(), IsAuthor()]
+        return [IsAuthenticated()]
 
     def get_serializer_class(
         self,
