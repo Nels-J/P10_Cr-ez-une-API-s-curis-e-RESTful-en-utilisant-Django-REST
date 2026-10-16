@@ -1,10 +1,9 @@
-from datetime import date
-
 import pytest
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from support_app.factory import UserFactory
 from support_app.models import Contributor, Issue, Project, User
 
 
@@ -15,20 +14,12 @@ def api_client():
 
 @pytest.fixture
 def owner(db):
-    return User.objects.create_user(
-        username="owner",
-        password="pass1234",
-        birth_date=date(1990, 1, 1),
-    )
+    return UserFactory(username="owner")
 
 
 @pytest.fixture
 def other(db):
-    return User.objects.create_user(
-        username="other",
-        password="pass1234",
-        birth_date=date(1992, 1, 1),
-    )
+    return UserFactory(username="other")
 
 
 @pytest.fixture
@@ -58,7 +49,9 @@ def test_project_retrieve_forbidden_if_not_contributor(api_client, other, projec
 
 
 @pytest.mark.django_db
-def test_contributor_create_allows_authenticated_user_to_join(api_client, other, project):
+def test_contributor_create_allows_authenticated_user_to_join(
+    api_client, other, project
+):
     api_client.force_authenticate(other)
     response = api_client.post(
         reverse("contributor-list", kwargs={"project_id": project.id}),

@@ -13,10 +13,7 @@ def api_client():
 
 @pytest.fixture
 def user(db):
-    user = UserFactory.create()
-    user.set_password("pass1234")
-    user.save()
-    return user
+    return UserFactory.create()
 
 
 @pytest.fixture
