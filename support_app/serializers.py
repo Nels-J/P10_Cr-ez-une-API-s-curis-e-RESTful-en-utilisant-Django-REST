@@ -86,23 +86,29 @@ class ProjectSerializer(serializers.ModelSerializer):
 class ContributorSerializer(serializers.ModelSerializer[Contributor]):
     class Meta:
         model = Contributor
-        fields = ["id", "contributor", "project", "created_time"]
-        read_only_fields = ["id", "project", "contributor","created_time"]
+        fields = ["id", "user", "project", "created_time"]
+        read_only_fields = ["id", "project", "user", "created_time"]
 
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
-        request = self.context.get("request")  # Get the request object from the serializer context
-        project_id = self.context["view"].kwargs["project_id"]  # Get the project_id from the view's URL kwargs
+        # Get the request object from the serializer context
+        request = self.context.get("request")
+        # Get the project_id from the view's URL kwargs
+        project_id = self.context["view"].kwargs["project_id"]
 
+        # Check if the user is trying to add themselves as a contributor
         if Contributor.objects.filter(
-                contributor=request.user,
-                project_id=project_id,
-        ).exists():  # Check if the user is already a contributor to the project.
+            # Check if the user requester is already a contributor to the project.
+            user=request.user,
+            # Check if the project_id matches the one in the URL kwargs.
+            project_id=project_id,
+        ).exists():
             # If the user is already a contributor, raise a validation error.
             raise serializers.ValidationError(
                 "Cet utilisateur est déjà un contributeur de ce projet."
             )
 
-        return attrs  # Return the modified attrs dictionary, which will be used to create the Contributor instance.
+        # Return the modified attrs dict to be used to create the Contributor instance.
+        return attrs
 
 
 class IssueSerializer(serializers.ModelSerializer):

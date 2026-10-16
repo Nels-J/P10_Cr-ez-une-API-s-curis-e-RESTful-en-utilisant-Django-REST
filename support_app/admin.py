@@ -7,9 +7,9 @@ from support_app.models import Contributor, Project, User
 # Register your models here, making them accessible on Django admin interface.
 @admin.register(Contributor)
 class ContributorAdmin(admin.ModelAdmin):
-    list_display = ("project", "contributor", "created_time")
-    search_fields = ("project__name", "contributor__username")
-    list_filter = ("contributor",)
+    list_display = ("project", "user", "created_time")
+    search_fields = ("project__name", "user__username")
+    list_filter = ("user",)
 
 
 @admin.register(Project)
