@@ -4,23 +4,15 @@ from support_app.models import Project
 
 
 class IsContributor(permissions.BasePermission):
-    """
-    Custom permission to only allow contributors of a project to access it.
-    """
-
+    # Custom permission to only allow contributors of a project to access it.
     def has_permission(self, request, view):
-        # Get the project_id from the URL kwargs
         project_id = view.kwargs.get("project_id")
-
-        if project_id is not None:
-            # Check if the user is a contributor to the project
-            return Project.objects.filter(
-                id=project_id,
-                contributor__user=request.user
-            ).exists()
-        else:
-            # Allow access if project_id is not provided (e.g., for list view)
+        if project_id is None:
             return True
+        return Project.objects.filter(
+            id=project_id,
+            contributor__user=request.user,
+        ).exists()
 
 
 class IsAuthor(permissions.BasePermission):

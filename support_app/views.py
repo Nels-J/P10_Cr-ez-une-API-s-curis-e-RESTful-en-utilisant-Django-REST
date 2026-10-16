@@ -75,9 +75,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
 
 class ContributorViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
     queryset = Contributor.objects.all()
     serializer_class = ContributorSerializer
+
+    # Custom permission handling based on the action being performed.
+    def get_permissions(self):
+        if self.action == "create":
+            return [IsAuthenticated()]
+        return [IsAuthenticated(), IsContributor()]
 
     def get_queryset(self):
         return self.queryset.filter(project_id=self.kwargs["project_id"])
