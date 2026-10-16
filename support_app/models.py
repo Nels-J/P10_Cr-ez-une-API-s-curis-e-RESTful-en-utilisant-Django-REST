@@ -42,10 +42,11 @@ class Project(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        if not Contributor.objects.filter(contributor=self.author, project=self).exists():
+        if not Contributor.objects.filter(user=self.author, project=self).exists():
             Contributor.objects.create(
-                contributor=self.author,
-                project=self
+                user=self.author,
+                project=self,
+                role="Author",
             )
 
 
@@ -54,16 +55,17 @@ class Project(models.Model):
 
 
 class Contributor(models.Model):
-    contributor = models.ForeignKey(
+    user = models.ForeignKey(
         User, on_delete=PROTECT, related_name="contributions"
     )
     project = models.ForeignKey(Project, on_delete=CASCADE)
     created_time = models.DateTimeField(default=timezone.now)
+    role = models.CharField(max_length=50, null=False, default="Contributor")
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["contributor", "project"], name="unique_project_contributor"
+                fields=["user", "project"], name="unique_project_contributor"
             )
         ]
 
