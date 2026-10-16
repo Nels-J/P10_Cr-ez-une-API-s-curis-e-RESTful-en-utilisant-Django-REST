@@ -95,13 +95,13 @@ class ContributorViewSet(viewsets.ModelViewSet):
 
 
 class IssueViewSet(viewsets.ModelViewSet):
-    permission_classes = [
-        IsAuthenticated,
-        IsContributor,
-        IsAuthor,
-    ]  # only authenticated users can access this viewset, and they must be contributor or author of the issue.
     queryset = Issue.objects.all()
     serializer_class = IssueSerializer
+
+    def get_permissions(self):
+        if self.action in {"update", "partial_update", "destroy"}:
+            return [IsAuthenticated(), IsContributor(), IsAuthor()]
+        return [IsAuthenticated(), IsContributor()]
 
     def get_queryset(self):
         return self.queryset.filter(
