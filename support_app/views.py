@@ -18,13 +18,9 @@ from .serializers import (
 
 class UserViewSet(viewsets.ModelViewSet[User]):
     permission_classes = [IsAuthenticated]
-    # surcharge the default pagination to display 2 users per page.
-    # todo check
 
-    queryset = (
-        User.objects.all()
-    )  # The base queryset for viewset, which will be filtered based on the action.
-    lookup_url_kwarg = "user_id"  # The parameter name on the URL that will be used to look up individual users.
+    queryset = (User.objects.all())
+    lookup_url_kwarg = "user_id"
 
     def check_permissions(self, request: Request) -> None:
         if request.method == "POST":
@@ -37,10 +33,10 @@ class UserViewSet(viewsets.ModelViewSet[User]):
         self,
     ) -> type[UserSerializer, UserDetailSerializer | UserUpdateSerializer]:
         if self.action == "create":
-            return UserSerializer  # For "create" action, use the UserSerializer.
+            return UserSerializer
         if self.action in {"update", "partial_update"}:
-            return UserUpdateSerializer  # For "update" and "partial_update" actions, use the UserUpdateSerializer.
-        return UserDetailSerializer  # For "list" and "retrieve" actions, use the UserDetailSerializer.
+            return UserUpdateSerializer
+        return UserDetailSerializer
 
     def get_object(self):
         if self.kwargs.get(self.lookup_url_kwarg) is None:
