@@ -51,7 +51,7 @@ class UserViewSet(viewsets.ModelViewSet[User]):
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
-    queryset = Project.objects.all()
+    queryset = Project.objects.all().order_by("-created_time")
     lookup_url_kwarg = "project_id"
 
     # Custom permission handling based on the action being performed.
@@ -75,7 +75,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
 
 class ContributorViewSet(viewsets.ModelViewSet):
-    queryset = Contributor.objects.all()
+    queryset = Contributor.objects.all().order_by("-created_time")
     serializer_class = ContributorSerializer
 
     # Custom permission handling based on the action being performed.
@@ -95,7 +95,7 @@ class ContributorViewSet(viewsets.ModelViewSet):
 
 
 class IssueViewSet(viewsets.ModelViewSet):
-    queryset = Issue.objects.all()
+    queryset = Issue.objects.all().order_by("-created_time")
     serializer_class = IssueSerializer
 
     def get_permissions(self):
