@@ -10,14 +10,18 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 
-from support_app.views import UserViewSet, ProjectViewSet, ContributorViewSet, IssueViewSet
+from support_app.views import (
+    UserViewSet,
+    ProjectViewSet,
+    ContributorViewSet,
+    IssueViewSet,
+)
 
 urlpatterns = [
     # Auth JWT
     path("auth/jwt/create/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("auth/jwt/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("auth/jwt/verify/", TokenVerifyView.as_view(), name="token_verify"),
-
     # Users
     path(
         "users/",
@@ -29,7 +33,6 @@ urlpatterns = [
         UserViewSet.as_view({"get": "retrieve", "patch": "partial_update"}),
         name="user-me",
     ),
-
     # Projects
     path(
         "projects/",
@@ -38,22 +41,28 @@ urlpatterns = [
     ),
     path(
         "projects/<int:project_id>/",
-        ProjectViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"}),
+        ProjectViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
+        ),
         name="project-detail",
     ),
-
     # Contributors
     path(
         "projects/<int:project_id>/contributors/",
         ContributorViewSet.as_view({"get": "list", "post": "create"}),
         name="contributor-list",
     ),
-
     # Issues
     path(
         "projects/<int:project_id>/issues/",
         IssueViewSet.as_view({"get": "list", "post": "create"}),
         name="issue-list",
     ),
-
+    path(
+        "projects/<int:project_id>/issues/<int:pk>/",
+        IssueViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
+        ),
+        name="issue-detail",
+    ),
 ]
