@@ -1,0 +1,944 @@
+openapi: 3.0.3
+info:
+  title: SoftDesk API
+  version: 0.0.1
+  description: API for managing projects, contributors, and issues in SoftDesk.
+paths:
+  /api/auth/jwt/create/:
+    post:
+      operationId: auth_jwt_create_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /api/auth/jwt/refresh/:
+    post:
+      operationId: auth_jwt_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/auth/jwt/verify/:
+    post:
+      operationId: auth_jwt_verify_create
+      description: |-
+        Takes a token and indicates if it is valid.  This view provides no
+        information about a token's fitness for a particular use.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenVerify'
+          description: ''
+  /api/projects/:
+    get:
+      operationId: projects_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      tags:
+      - projects
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProjectDetailList'
+          description: ''
+    post:
+      operationId: projects_create
+      tags:
+      - projects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Project'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Project'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+          description: ''
+  /api/projects/{project_id}/:
+    get:
+      operationId: projects_retrieve
+      parameters:
+      - in: path
+        name: project_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - projects
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDetail'
+          description: ''
+    patch:
+      operationId: projects_partial_update
+      parameters:
+      - in: path
+        name: project_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - projects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectUpdate'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectUpdate'
+          description: ''
+    delete:
+      operationId: projects_destroy
+      parameters:
+      - in: path
+        name: project_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - projects
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/projects/{project_id}/contributors/:
+    get:
+      operationId: projects_contributors_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: path
+        name: project_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - projects
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedContributorList'
+          description: ''
+    post:
+      operationId: projects_contributors_create
+      parameters:
+      - in: path
+        name: project_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - projects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contributor'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Contributor'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Contributor'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contributor'
+          description: ''
+  /api/projects/{project_id}/issues/:
+    get:
+      operationId: projects_issues_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      - in: path
+        name: project_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - projects
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedIssueList'
+          description: ''
+    post:
+      operationId: projects_issues_create
+      parameters:
+      - in: path
+        name: project_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - projects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Issue'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Issue'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Issue'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Issue'
+          description: ''
+  /api/projects/{project_id}/issues/{id}/:
+    get:
+      operationId: projects_issues_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: project_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - projects
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Issue'
+          description: ''
+    patch:
+      operationId: projects_issues_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: project_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - projects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedIssue'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedIssue'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedIssue'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Issue'
+          description: ''
+    delete:
+      operationId: projects_issues_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: project_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - projects
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/users/:
+    get:
+      operationId: users_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un numéro de page de l'ensemble des résultats.
+        schema:
+          type: integer
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserDetailList'
+          description: ''
+    post:
+      operationId: users_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/me/:
+    get:
+      operationId: users_me_retrieve
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+          description: ''
+    patch:
+      operationId: users_me_partial_update
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserUpdate'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserUpdate'
+          description: ''
+components:
+  schemas:
+    BlankEnum:
+      enum:
+      - ''
+    CategoryEnum:
+      enum:
+      - Back-End
+      - Front-End
+      - iOS
+      - Android
+      type: string
+      description: |-
+        * `Back-End` - Back-End
+        * `Front-End` - Front-End
+        * `iOS` - iOS
+        * `Android` - Android
+    Contributor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        project:
+          type: integer
+          readOnly: true
+        created_time:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_time
+      - id
+      - project
+      - user
+    Issue:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        tags:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/TagsEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        priority:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/PriorityEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        assignee:
+          type: integer
+          nullable: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        project:
+          type: integer
+          readOnly: true
+        created_time:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_time
+      - id
+      - project
+      - title
+    NullEnum:
+      enum:
+      - null
+    PaginatedContributorList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contributor'
+    PaginatedIssueList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Issue'
+    PaginatedProjectDetailList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectDetail'
+    PaginatedUserDetailList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserDetail'
+    PatchedIssue:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        tags:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/TagsEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        priority:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/PriorityEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        assignee:
+          type: integer
+          nullable: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        project:
+          type: integer
+          readOnly: true
+        created_time:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedProjectUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+    PatchedUserUpdate:
+      type: object
+      properties:
+        can_data_be_shared:
+          type: boolean
+          title: Les données peuvent être partagées
+        can_be_contacted:
+          type: boolean
+          title: Peut être contacté
+    PriorityEnum:
+      enum:
+      - Low
+      - Medium
+      - High
+      type: string
+      description: |-
+        * `Low` - Low
+        * `Medium` - Medium
+        * `High` - High
+    Project:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        created_time:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - category
+      - created_time
+      - id
+      - name
+    ProjectDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        author:
+          type: integer
+          readOnly: true
+        created_time:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author
+      - category
+      - created_time
+      - id
+      - name
+    ProjectUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+      required:
+      - category
+      - name
+    StatusEnum:
+      enum:
+      - To Do
+      - In Progress
+      - Finished
+      type: string
+      description: |-
+        * `To Do` - To Do
+        * `In Progress` - In Progress
+        * `Finished` - Finished
+    TagsEnum:
+      enum:
+      - Bug
+      - Feature
+      - Task
+      type: string
+      description: |-
+        * `Bug` - Bug
+        * `Feature` - Feature
+        * `Task` - Task
+    TokenObtainPair:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - password
+      - refresh
+      - username
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
+    TokenVerify:
+      type: object
+      properties:
+        token:
+          type: string
+          writeOnly: true
+      required:
+      - token
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          title: Nom d’utilisateur
+          description: Requis. 150 caractères maximum. Uniquement des lettres, nombres
+            et les caractères « @ », « . », « + », « - » et « _ ».
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+          title: Mot de passe
+          maxLength: 128
+        birth_date:
+          type: string
+          format: date
+          title: Date de naissance
+        can_data_be_shared:
+          type: boolean
+          title: Les données peuvent être partagées
+        can_be_contacted:
+          type: boolean
+          title: Peut être contacté
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Date d’inscription
+      required:
+      - birth_date
+      - date_joined
+      - id
+      - password
+      - username
+    UserDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+          title: Nom d’utilisateur
+          description: Requis. 150 caractères maximum. Uniquement des lettres, nombres
+            et les caractères « @ », « . », « + », « - » et « _ ».
+        birth_date:
+          type: string
+          format: date
+          title: Date de naissance
+        can_data_be_shared:
+          type: boolean
+          title: Les données peuvent être partagées
+        can_be_contacted:
+          type: boolean
+          title: Peut être contacté
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Date d’inscription
+      required:
+      - birth_date
+      - date_joined
+      - id
+      - username
+    UserUpdate:
+      type: object
+      properties:
+        can_data_be_shared:
+          type: boolean
+          title: Les données peuvent être partagées
+        can_be_contacted:
+          type: boolean
+          title: Peut être contacté
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

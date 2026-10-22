@@ -1,3 +1,10 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiResponse,
+    extend_schema,
+    extend_schema_view,
+)
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -19,7 +26,7 @@ from .serializers import (
 class UserViewSet(viewsets.ModelViewSet[User]):
     permission_classes = [IsAuthenticated]
 
-    queryset = (User.objects.all())
+    queryset = User.objects.all()
     lookup_url_kwarg = "user_id"
 
     def check_permissions(self, request: Request) -> None:
@@ -90,6 +97,61 @@ class ContributorViewSet(viewsets.ModelViewSet):
         )
 
 
+# IssueViewSet with detailed schema documentation for each action.
+@extend_schema_view(
+    retrieve=extend_schema(
+        # Summary s'affiche sur la ligne du endpoint dans la doc swagger
+        summary="Retrieve issue",
+        # Description s'affiche dans la doc swagger quand on clique sur l'endpoint.
+        description="Retourne une issue par son id dans le contexte d'un projet.",
+        # Parameters s'affiche dans la doc swagger et permet de documenter les
+        # paramètres de l'URL, ici project_id et pk (id de l'issue).
+        parameters=[
+            OpenApiParameter(
+                name="project_id",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                required=True,
+                description="ID du projet parent",
+            ),
+            OpenApiParameter(
+                name="pk",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                required=True,
+                description="ID de l'issue",
+            ),
+        ],
+        responses={
+            200: IssueSerializer,
+            403: OpenApiResponse(description="Accès refusé"),
+            404: OpenApiResponse(description="Issue ou projet introuvable"),
+        },
+    ),
+    list=extend_schema(
+        description="List all issues for a specific project.",
+        responses={200: IssueSerializer(many=True)},
+    ),
+    create=extend_schema(
+        description="Create a new issue for a specific project.",
+        request=IssueSerializer,
+        responses={201: IssueSerializer},
+    ),
+    update=extend_schema(
+        description="Update an existing issue. Only the author can update.",
+        request=IssueSerializer,
+        responses={200: IssueSerializer},
+    ),
+    partial_update=extend_schema(
+        description="Partially update an existing issue. Only the author can update.",
+        request=IssueSerializer,
+        responses={200: IssueSerializer},
+    ),
+    destroy=extend_schema(
+        description="Delete an existing issue. Only the author can delete.",
+        responses={204: None},
+    ),
+)
 class IssueViewSet(viewsets.ModelViewSet):
     queryset = Issue.objects.all().order_by("-created_time")
     serializer_class = IssueSerializer

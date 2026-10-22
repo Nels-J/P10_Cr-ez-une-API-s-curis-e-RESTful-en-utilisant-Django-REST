@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
     "support_app",
     "debug_toolbar",
 ]
@@ -129,16 +131,30 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",  # "rest_framework.permissions.AllowAny",
+        "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 3,
+    # DRF Spectacular settings
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),  # Durée de vie courte
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),  # Durée de vie longue
-    # 'ROTATE_REFRESH_TOKENS'   : True,  # Rotation des tokens
-    # 'BLACKLIST_AFTER_ROTATION': True,  # Blacklist les anciens
+    # "ROTATE_REFRESH_TOKENS"       : True,  # Rotation des tokens
+    # "BLACKLIST_AFTER_ROTATION": True,  # Blacklist les anciens
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "SoftDesk API",
+    "DESCRIPTION": "API for managing projects, contributors, and issues in SoftDesk.",
+    "VERSION": "0.0.1",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
+    # Décommente la ligne suivante pour retirer le préfixe /api dans
+    # la présentation des paths OpenAPI
+    # "SCHEMA_PATH_PREFIX": r"/api",
 }
