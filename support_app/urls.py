@@ -11,10 +11,10 @@ from rest_framework_simplejwt.views import (
 )
 
 from support_app.views import (
-    UserViewSet,
-    ProjectViewSet,
     ContributorViewSet,
     IssueViewSet,
+    ProjectViewSet,
+    UserViewSet,
 )
 
 urlpatterns = [
