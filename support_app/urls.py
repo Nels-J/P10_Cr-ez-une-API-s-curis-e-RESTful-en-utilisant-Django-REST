@@ -4,6 +4,7 @@ URL configuration for softdesk project.
 """
 
 from django.urls import path
+from django.views.generic.base import RedirectView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -11,17 +12,24 @@ from rest_framework_simplejwt.views import (
 )
 
 from support_app.views import (
-    UserViewSet,
-    ProjectViewSet,
     ContributorViewSet,
     IssueViewSet,
+    ProjectViewSet,
+    UserViewSet,
 )
 
 urlpatterns = [
+    path(
+        "",
+        RedirectView.as_view(url="/api/schema/swagger-ui/", permanent=False),
+        name="home"
+    ),
+
     # Auth JWT
     path("auth/jwt/create/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("auth/jwt/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("auth/jwt/verify/", TokenVerifyView.as_view(), name="token_verify"),
+
     # Users
     path(
         "users/",
@@ -33,6 +41,7 @@ urlpatterns = [
         UserViewSet.as_view({"get": "retrieve", "patch": "partial_update"}),
         name="user-me",
     ),
+
     # Projects
     path(
         "projects/",
@@ -46,12 +55,14 @@ urlpatterns = [
         ),
         name="project-detail",
     ),
+
     # Contributors
     path(
         "projects/<int:project_id>/contributors/",
         ContributorViewSet.as_view({"get": "list", "post": "create"}),
         name="contributor-list",
     ),
+
     # Issues
     path(
         "projects/<int:project_id>/issues/",
