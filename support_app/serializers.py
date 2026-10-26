@@ -11,12 +11,14 @@ from .models import Contributor, Issue, Project, User
 class UserUpdateSerializer(serializers.ModelSerializer[User]):
     class Meta:
         model = User
+        # Only allow updating the fields that are relevant for user preferences
         fields = ["can_data_be_shared", "can_be_contacted"]
 
 
 class UserDetailSerializer(serializers.ModelSerializer[User]):
     class Meta:
         model = User
+        # Define fields to be included in the serialized representation of the model
         fields = [
             "id",
             "username",
@@ -25,6 +27,7 @@ class UserDetailSerializer(serializers.ModelSerializer[User]):
             "can_be_contacted",
             "date_joined",
         ]
+        # Define fields that should be read-only in the serialized representation
         read_only_fields = ["id", "username", "date_joined"]
 
 
@@ -41,9 +44,8 @@ class UserSerializer(serializers.ModelSerializer[User]):
             "date_joined",
         ]
         read_only_fields = ["id", "date_joined"]
-        extra_kwargs = {
-            "password": {"write_only": True}
-        }  # Ensure password is in write-only mode for security reasons
+        # Ensure password is in write-only mode for security reasons
+        extra_kwargs = {"password": {"write_only": True}}
 
     def validate_birth_date(self, value: date) -> date:
         today = timezone.localdate()
@@ -61,7 +63,8 @@ class UserSerializer(serializers.ModelSerializer[User]):
     def create(self, validated_data: dict[str, Any]) -> User:
         user = User.objects.create_user(
             username=validated_data["username"],
-            password=validated_data["password"],  # Use create_user to hash the password
+            # Password is hashed in create_user method
+            password=validated_data["password"],
             birth_date=validated_data["birth_date"],
             can_data_be_shared=validated_data.get("can_data_be_shared", False),
             can_be_contacted=validated_data.get("can_be_contacted", False),
@@ -81,14 +84,14 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "description", "category", "author", "created_time"]
         read_only_fields = ["id", "author", "created_time"]
 
+
 # decorator to ensure that the creation of a project and its associated contributors
 # is atomic, meaning that either both operations succeed or neither does, preventing
 # partial updates that could lead to data inconsistencies.
 @transaction.atomic
 class ProjectSerializer(serializers.ModelSerializer):
-    author = serializers.HiddenField(
-        default=serializers.CurrentUserDefault()
-    )  # Automatically set the author to the currently authenticated user
+    # Automatically set the author to the currently authenticated user
+    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Project
@@ -125,6 +128,7 @@ class ContributorSerializer(serializers.ModelSerializer[Contributor]):
 
 
 class IssueSerializer(serializers.ModelSerializer):
+    # Automatically set the author to the currently authenticated user
     author = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
@@ -143,6 +147,7 @@ class IssueSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["created_time", "id", "project"]
 
+    # Automatically set the project to the one specified in the URL
     def create(self, validated_data):
         validated_data["project_id"] = self.context["view"].kwargs["project_id"]
         return super().create(validated_data)
