@@ -31,6 +31,9 @@ class Category(models.TextChoices):
 
 
 class Project(models.Model):
+    # When trying to delete a user who has authored projects, the deletion will be not
+    # allowed to prevent orphaned projects.
+    # User must delete their projects first.
     author = models.ForeignKey(User, on_delete=PROTECT, related_name="projects")
     created_time = models.DateTimeField(default=timezone.now)
     name = models.CharField(max_length=255, null=False, blank=False)
@@ -55,9 +58,13 @@ class Project(models.Model):
 
 
 class Contributor(models.Model):
+    # When trying to delete a user who has contributed to projects, the deletion will
+    # be not allowed to prevent orphaned contributions.
+    # User must remove their contributions first.
     user = models.ForeignKey(
         User, on_delete=PROTECT, related_name="contributions"
     )
+    # When Project is deleted all related contributors will be deleted as well
     project = models.ForeignKey(Project, on_delete=CASCADE)
     created_time = models.DateTimeField(default=timezone.now)
     role = models.CharField(max_length=50, null=False, default="Contributor")
@@ -91,8 +98,15 @@ class Priority(models.TextChoices):
 class Issue(models.Model):
     title = models.CharField(max_length=255, null=False, blank=False)
     description = models.TextField(null=True, blank=True)
+    # When Project is deleted all related issues will be deleted as well
     project = models.ForeignKey(Project, on_delete=CASCADE)
+    # When trying to delete a user who has authored issues, the deletion will be not
+    # allowed to prevent orphaned issues.
+    # User must delete their issues first.
     author = models.ForeignKey(User, on_delete=PROTECT, related_name="created_issues")
+    # When trying to delete a user who has been assigned issues, the deletion will be
+    # not allowed to prevent orphaned issues.
+    # User must reassign their issues first.
     assignee = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
@@ -111,7 +125,11 @@ class Issue(models.Model):
 
 
 class Comment(models.Model):
+    # When Issue is deleted all related comments will be deleted as well
     issue = models.ForeignKey(Issue, on_delete=CASCADE)
+    # When trying to delete a user who has authored comments, the deletion will be not
+    # allowed to prevent orphaned comments.
+    # User must delete their comments first.
     author = models.ForeignKey(User, on_delete=PROTECT, related_name="comments")
     content = models.TextField(null=False, blank=False)
     created_time = models.DateTimeField(default=timezone.now)
