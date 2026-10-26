@@ -25,10 +25,18 @@ SECRET_KEY = "django-insecure-8)0@v#ts%j0%7)e(mz%x)*fr84yt*g^9z5utgt)7^ib$h=-$_l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS: list[str] = []
+ALLOWED_HOSTS: list[str] = [
+    "127.0.0.1",
+    "localhost",
+]
+
+
+INTERNAL_IPS: list[str] = [
+    "127.0.0.1",
+]
+
 
 # Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -53,9 +61,6 @@ MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
-INTERNAL_IPS = [
-    "127.0.0.1",
-]
 
 ROOT_URLCONF = "softdesk.urls"
 
