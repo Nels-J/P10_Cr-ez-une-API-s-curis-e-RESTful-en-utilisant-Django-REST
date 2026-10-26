@@ -5,7 +5,7 @@ from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers
 
-from .models import User, Project, Contributor, Issue
+from .models import Contributor, Issue, Project, User
 
 
 class UserUpdateSerializer(serializers.ModelSerializer[User]):
@@ -17,7 +17,14 @@ class UserUpdateSerializer(serializers.ModelSerializer[User]):
 class UserDetailSerializer(serializers.ModelSerializer[User]):
     class Meta:
         model = User
-        fields = ["id", "username", "birth_date", "can_data_be_shared", "can_be_contacted", "date_joined"]
+        fields = [
+            "id",
+            "username",
+            "birth_date",
+            "can_data_be_shared",
+            "can_be_contacted",
+            "date_joined",
+        ]
         read_only_fields = ["id", "username", "date_joined"]
 
 
@@ -31,10 +38,12 @@ class UserSerializer(serializers.ModelSerializer[User]):
             "birth_date",
             "can_data_be_shared",
             "can_be_contacted",
-            "date_joined"
+            "date_joined",
         ]
         read_only_fields = ["id", "date_joined"]
-        extra_kwargs = {"password": {"write_only": True}}  # Ensure password is write-only
+        extra_kwargs = {
+            "password": {"write_only": True}
+        }  # Ensure password is in write-only mode for security reasons
 
     def validate_birth_date(self, value: date) -> date:
         today = timezone.localdate()
@@ -72,10 +81,14 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "description", "category", "author", "created_time"]
         read_only_fields = ["id", "author", "created_time"]
 
-
-@transaction.atomic  # Ensure that the creation of a project and its initial contributor is atomic
+# decorator to ensure that the creation of a project and its associated contributors
+# is atomic, meaning that either both operations succeed or neither does, preventing
+# partial updates that could lead to data inconsistencies.
+@transaction.atomic
 class ProjectSerializer(serializers.ModelSerializer):
-    author = serializers.HiddenField(default=serializers.CurrentUserDefault())  # Automatically set the author to the currently authenticated user
+    author = serializers.HiddenField(
+        default=serializers.CurrentUserDefault()
+    )  # Automatically set the author to the currently authenticated user
 
     class Meta:
         model = Project
@@ -116,9 +129,20 @@ class IssueSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Issue
-        fields = ['id', 'title', 'description', 'tags', 'priority','assignee', 'status','project', 'author', 'created_time']
-        read_only_fields = ['created_time', 'id', 'project']
+        fields = [
+            "id",
+            "title",
+            "description",
+            "tags",
+            "priority",
+            "assignee",
+            "status",
+            "project",
+            "author",
+            "created_time",
+        ]
+        read_only_fields = ["created_time", "id", "project"]
 
     def create(self, validated_data):
-        validated_data['project_id'] = self.context['view'].kwargs['project_id']
+        validated_data["project_id"] = self.context["view"].kwargs["project_id"]
         return super().create(validated_data)

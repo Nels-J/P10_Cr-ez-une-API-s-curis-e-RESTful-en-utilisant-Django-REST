@@ -25,16 +25,15 @@ SECRET_KEY = "django-insecure-8)0@v#ts%j0%7)e(mz%x)*fr84yt*g^9z5utgt)7^ib$h=-$_l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Hosts and internal IPs configuration
 ALLOWED_HOSTS: list[str] = [
     "127.0.0.1",
     "localhost",
 ]
 
-
 INTERNAL_IPS: list[str] = [
     "127.0.0.1",
 ]
-
 
 # Application definition
 INSTALLED_APPS = [
@@ -50,6 +49,7 @@ INSTALLED_APPS = [
     "debug_toolbar",
 ]
 
+# Middleware configuration
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -61,9 +61,10 @@ MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
-
+# URL configuration
 ROOT_URLCONF = "softdesk.urls"
 
+# Templates configuration
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -79,6 +80,7 @@ TEMPLATES = [
     },
 ]
 
+# WSGI application configuration
 WSGI_APPLICATION = "softdesk.wsgi.application"
 
 # Database
@@ -125,22 +127,32 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-AUTH_USER_MODEL = "support_app.User"  # Active le modèle personnalisé
+# Activate the custom user model
+AUTH_USER_MODEL = "support_app.User"
 
-# simplejwt token authentication settings
+# Django REST Framework configuration following best practices
+# for security and performance using JWT authentication and throttling.
 REST_FRAMEWORK = {
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/hour",
+        "user": "1000/hour",
+    },
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",  # "rest_framework.permissions.AllowAny",
+        "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 3,
 }
 
-
+# Configuration de JWT
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),  # Durée de vie courte
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),  # Durée de vie longue
