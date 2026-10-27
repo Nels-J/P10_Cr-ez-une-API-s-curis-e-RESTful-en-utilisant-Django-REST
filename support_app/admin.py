@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
 
-from support_app.models import Contributor, Project, User
+from support_app.models import Comment, Contributor, Issue, Project, User
+
 
 # Register your models here, making them accessible on Django admin interface.
 @admin.register(Contributor)
@@ -16,7 +17,7 @@ class ContributorAdmin(admin.ModelAdmin):
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ("name", "description", "category", "author")
     search_fields = ("name", "description", "category", "author__username")
-    list_filter = ("category",)
+    list_filter = ("category", "author")
 
 
 @admin.register(User)
@@ -30,8 +31,8 @@ class CustomUserAdmin(UserAdmin):
     if "birth_date" not in personal_info_fields:
         personal_info_fields.append("birth_date")
     fieldsets[1] = (
-            personal_info_title,
-            {"fields": tuple(personal_info_fields)},
+        personal_info_title,
+        {"fields": tuple(personal_info_fields)},
     )
 
     fieldsets.append(
@@ -83,3 +84,17 @@ class CustomUserAdmin(UserAdmin):
                 )
             )
         return readonly_fields
+
+
+@admin.register(Issue)
+class IssueAdmin(admin.ModelAdmin):
+    list_display = ("title", "project", "author", "status", "tags", "priority", "created_time")
+    search_fields = ("title", "description", "project__name", "author__username")
+    list_filter = ("priority", "status", "tags", "assignee", "project", "author")
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ("content", "issue", "author", "created_time")
+    search_fields = ("content", "issue__title", "author__username")
+    list_filter = ("issue",)
