@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.admin import RelatedOnlyFieldListFilter
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
 
@@ -95,6 +96,7 @@ class IssueAdmin(admin.ModelAdmin):
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ("content", "issue", "author", "created_time")
-    search_fields = ("content", "issue__title", "author__username")
-    list_filter = ("issue",)
+    list_display = ("content", "author", "created_time", "uuid", "issue", "issue__id")
+    search_fields = ("content", "issue__title", "author__username", "issue__id")
+    list_filter = (("issue", RelatedOnlyFieldListFilter),)
+
