@@ -85,10 +85,6 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "author", "created_time"]
 
 
-# decorator to ensure that the creation of a project and its associated contributors
-# is atomic, meaning that either both operations succeed or neither does, preventing
-# partial updates that could lead to data inconsistencies.
-@transaction.atomic
 class ProjectSerializer(serializers.ModelSerializer):
     # Automatically set the author to the currently authenticated user
     author = serializers.HiddenField(default=serializers.CurrentUserDefault())
@@ -97,6 +93,10 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = ["id", "name", "description", "category", "author", "created_time"]
         read_only_fields = ["id", "created_time"]
+
+    @transaction.atomic
+    def create(self, validated_data: Any) -> Project:
+        return super().create(validated_data)
 
 
 class ContributorSerializer(serializers.ModelSerializer[Contributor]):
@@ -148,6 +148,6 @@ class IssueSerializer(serializers.ModelSerializer):
         read_only_fields = ["created_time", "id", "project"]
 
     # Automatically set the project to the one specified in the URL
-    def create(self, validated_data):
+    def create(self, validated_data: Any) -> Issue:
         validated_data["project_id"] = self.context["view"].kwargs["project_id"]
         return super().create(validated_data)
