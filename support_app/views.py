@@ -19,7 +19,7 @@ from .serializers import (
 class UserViewSet(viewsets.ModelViewSet[User]):
     permission_classes = [IsAuthenticated]
 
-    queryset = (User.objects.all())
+    queryset = User.objects.all()
     lookup_url_kwarg = "user_id"
 
     def check_permissions(self, request: Request) -> None:
@@ -71,7 +71,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
 
 class ContributorViewSet(viewsets.ModelViewSet):
-    queryset = Contributor.objects.all().order_by("-created_time")
+    queryset = Contributor.objects.all()
     serializer_class = ContributorSerializer
 
     # Custom permission handling based on the action being performed.
@@ -81,7 +81,11 @@ class ContributorViewSet(viewsets.ModelViewSet):
         return [IsAuthenticated(), IsContributor()]
 
     def get_queryset(self):
-        return self.queryset.filter(project_id=self.kwargs["project_id"])
+        # Filter contributors by the project_id from the URL kwargs
+        # and order them by created_time in descending order.
+        return self.queryset.filter(project_id=self.kwargs["project_id"]).order_by(
+            "-created_time"
+        )
 
     def perform_create(self, serializer) -> None:
         serializer.save(
@@ -91,7 +95,7 @@ class ContributorViewSet(viewsets.ModelViewSet):
 
 
 class IssueViewSet(viewsets.ModelViewSet):
-    queryset = Issue.objects.all().order_by("-created_time")
+    queryset = Issue.objects.all()
     serializer_class = IssueSerializer
 
     def get_permissions(self):
@@ -100,12 +104,8 @@ class IssueViewSet(viewsets.ModelViewSet):
         return [IsAuthenticated(), IsContributor()]
 
     def get_queryset(self):
-        return self.queryset.filter(
-            project_id=self.kwargs["project_id"]
-        )  # Filter issues based on the project_id from the URL.
-
-    def perform_create(self, serializer) -> None:
-        serializer.save(
-            project_id=self.kwargs["project_id"],
-            author=self.request.user,
+        # Filter issues by the project_id from the URL kwargs
+        # and order them by created_time in descending order.
+        return self.queryset.filter(project_id=self.kwargs["project_id"]).order_by(
+            "-created_time"
         )
