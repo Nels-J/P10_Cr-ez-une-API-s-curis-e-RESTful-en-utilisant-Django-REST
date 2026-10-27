@@ -123,6 +123,9 @@ class Issue(models.Model):
     )
     tags = models.CharField(max_length=20, choices=Tag.choices, null=True, blank=True)
 
+    def __str__(self) -> str:
+        return self.title
+
 
 class Comment(models.Model):
     # When Issue is deleted all related comments will be deleted as well
