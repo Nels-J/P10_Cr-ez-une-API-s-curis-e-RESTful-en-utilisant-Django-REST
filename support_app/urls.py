@@ -11,6 +11,7 @@ from rest_framework_simplejwt.views import (
 )
 
 from support_app.views import (
+    CommentViewSet,
     ContributorViewSet,
     IssueViewSet,
     ProjectViewSet,
@@ -65,4 +66,17 @@ urlpatterns = [
         ),
         name="issue-detail",
     ),
+    # Comments
+    path(
+        "projects/<int:project_id>/issues/<int:issue_id>/comments/",
+        CommentViewSet.as_view({"get": "list", "post": "create"}),
+        name="comment-list",
+    ),
+    path(
+        "projects/<int:project_id>/issues/<int:issue_id>/comments/<int:pk>/",
+        CommentViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
+        ),
+        name="comment-detail",
+    )
 ]

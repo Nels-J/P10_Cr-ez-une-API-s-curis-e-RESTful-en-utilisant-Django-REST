@@ -5,7 +5,7 @@ from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers
 
-from .models import Contributor, Issue, Project, User
+from .models import Contributor, Issue, Project, User, Comment
 
 
 class UserUpdateSerializer(serializers.ModelSerializer[User]):
@@ -150,4 +150,19 @@ class IssueSerializer(serializers.ModelSerializer):
     # Automatically set the project to the one specified in the URL
     def create(self, validated_data: Any) -> Issue:
         validated_data["project_id"] = self.context["view"].kwargs["project_id"]
+        return super().create(validated_data)
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    # Automatically set the author to the currently authenticated user
+    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    class Meta:
+        model = Comment
+        fields = ["id", "uuid", "content", "author", "issue", "created_time"]
+        read_only_fields = ["id", "uuid", "created_time", "issue"]
+
+    # Automatically set the issue to the one specified in the URL
+    def create(self, validated_data: Any) -> Comment:
+        validated_data["issue_id"] = self.context["view"].kwargs["issue_id"]
         return super().create(validated_data)

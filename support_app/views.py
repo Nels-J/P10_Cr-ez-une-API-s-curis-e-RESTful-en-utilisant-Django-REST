@@ -2,9 +2,10 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 
-from .models import Contributor, Issue, Project, User
+from .models import Comment, Contributor, Issue, Project, User
 from .permissions import IsAuthor, IsContributor
 from .serializers import (
+    CommentSerializer,
     ContributorSerializer,
     IssueSerializer,
     ProjectDetailSerializer,
@@ -109,3 +110,21 @@ class IssueViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(project_id=self.kwargs["project_id"]).order_by(
             "-created_time"
         )
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    def get_permissions(self):
+        if self.action in {"update", "partial_update", "destroy"}:
+            return [IsAuthenticated(), IsContributor(), IsAuthor()]
+        return [IsAuthenticated(), IsContributor()]
+
+    def get_queryset(self):
+        # Filter comments by the issue_id from the URL kwargs
+        # and order them by created_time in descending order.
+        return self.queryset.filter(issue_id=self.kwargs["issue_id"]).order_by(
+            "-created_time"
+        )
+    
