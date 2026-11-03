@@ -1,9 +1,11 @@
+import uuid
+
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import PROTECT, CASCADE
+from django.db.models import CASCADE, PROTECT
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-import uuid
 
 
 class User(AbstractUser):
@@ -52,7 +54,6 @@ class Project(models.Model):
                 role="Author",
             )
 
-
     def __str__(self) -> str:
         return self.name
 
@@ -61,9 +62,7 @@ class Contributor(models.Model):
     # When trying to delete a user who has contributed to projects, the deletion will
     # be not allowed to prevent orphaned contributions.
     # User must remove their contributions first.
-    user = models.ForeignKey(
-        User, on_delete=PROTECT, related_name="contributions"
-    )
+    user = models.ForeignKey(User, on_delete=PROTECT, related_name="contributions")
     # When Project is deleted all related contributors will be deleted as well
     project = models.ForeignKey(Project, on_delete=CASCADE)
     created_time = models.DateTimeField(default=timezone.now)
@@ -122,6 +121,32 @@ class Issue(models.Model):
         max_length=20, choices=Priority.choices, null=True, blank=True
     )
     tags = models.CharField(max_length=20, choices=Tag.choices, null=True, blank=True)
+
+    # Only contributors of the project can be assigned to the issue.
+    def clean(self):
+        super().clean()
+        if self.assignee_id is None:
+            return
+
+        if (
+            self.project_id is None
+            or not Contributor.objects.filter(
+                project_id=self.project_id,
+                user_id=self.assignee_id,
+            ).exists()
+        ):
+            raise ValidationError(
+                {
+                    "assignee": _(
+                        "Seul un contributeur du projet peut être assigné à l'issue."
+                    )
+                }
+            )
+
+    def save(self, *args, **kwargs):
+        # Keep business rule enforcement consistent across API, admin and shell.
+        self.full_clean()
+        return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return self.title

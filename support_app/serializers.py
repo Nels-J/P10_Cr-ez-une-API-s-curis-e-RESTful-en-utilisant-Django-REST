@@ -1,11 +1,12 @@
 from datetime import date
 from typing import Any
 
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers
 
-from .models import Contributor, Issue, Project, User, Comment
+from .models import Comment, Contributor, Issue, Project, User
 
 
 class UserUpdateSerializer(serializers.ModelSerializer[User]):
@@ -146,6 +147,54 @@ class IssueSerializer(serializers.ModelSerializer):
             "created_time",
         ]
         read_only_fields = ["created_time", "id", "project"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        assignee_field = self.fields.get("assignee")
+        if not isinstance(assignee_field, serializers.PrimaryKeyRelatedField):
+            return
+
+        view = self.context.get("view")
+
+        project_id = getattr(view, "kwargs", {}).get("project_id") if view else None
+        if project_id is None and self.instance is not None:
+            project_id = self.instance.project_id
+
+        # If project_id is still None, set the queryset to none
+        if project_id is None:
+            assignee_field.queryset = User.objects.none()
+            return
+
+        # Set the queryset to only include users who are contributors to the project
+        assignee_field.queryset = User.objects.filter(
+            contributions__project_id=project_id
+        ).distinct()
+
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        # Validate that the assignee is a contributor to the project
+        project = attrs.get("project")
+        if project is None and self.instance is not None:
+            project = self.instance.project
+
+        # If project is still None, try to get it from the view context
+        if project is None:
+            view = self.context.get("view")
+            project_id = getattr(view, "kwargs", {}).get("project_id") if view else None
+            if project_id is not None:
+                project = Project.objects.filter(pk=project_id).first()
+
+        assignee = attrs.get("assignee")
+        if "assignee" not in attrs and self.instance is not None:
+            assignee = self.instance.assignee
+
+        issue = Issue(project=project, assignee=assignee)
+        try:
+            issue.clean()
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(exc.message_dict) from exc
+
+        return attrs
 
     # Automatically set the project to the one specified in the URL
     def create(self, validated_data: Any) -> Issue:

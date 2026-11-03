@@ -89,14 +89,60 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(Issue)
 class IssueAdmin(admin.ModelAdmin):
-    list_display = ("title", "project", "author", "status", "tags", "priority", "created_time")
+    list_display = (
+        "title",
+        "project",
+        "author",
+        "status",
+        "tags",
+        "priority",
+        "created_time",
+    )
     search_fields = ("title", "description", "project__name", "author__username")
     list_filter = ("priority", "status", "tags", "assignee", "project", "author")
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        # Customize the queryset for the assignee field based on the project context.
+        if db_field.name == "assignee":
+            project_id = request.GET.get("project")
+
+            # If project_id is not found in the GET parameters,
+            # try to extract it from the URL resolver kwargs.
+            resolver_kwargs = getattr(
+                getattr(request, "resolver_match", None), "kwargs", {}
+            )
+            object_id = resolver_kwargs.get("object_id")
+            if object_id:
+                project_id = (
+                    Issue.objects.filter(pk=object_id)
+                    .values_list("project_id", flat=True)
+                    .first()
+                )
+
+            # If project_id is not None, filter the queryset for assignee field to
+            # only include users who are contributors to the project.
+            if project_id:
+                kwargs["queryset"] = User.objects.filter(
+                    contributions__project_id=project_id
+                ).distinct()
+            else:
+                kwargs["queryset"] = User.objects.none()
+
+        # If the db_field is not "assignee", or if project_id is None,
+        # fall back to the default behavior.
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ("content", "author", "created_time", "uuid", "issue", "issue__id")
+    list_display = (
+        "id",
+        "content",
+        "author",
+        "uuid",
+        "created_time",
+        "issue__id",
+        "issue",
+    )
     search_fields = ("content", "issue__title", "author__username", "issue__id")
     list_filter = (("issue", RelatedOnlyFieldListFilter),)
-
