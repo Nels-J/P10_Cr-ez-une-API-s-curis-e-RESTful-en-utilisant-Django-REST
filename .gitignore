@@ -87,3 +87,6 @@ notes/
 
 # Copilot settings
 AGENTS.md
+
+# jetbrains project files
+.idea/
